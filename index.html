@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>有色ETF银华(159871)实时监控</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -12,100 +13,171 @@
             background: #0d1117;
             min-height: 100vh;
             color: #e6edf3;
-            padding: 16px;
+            padding: 12px;
+            font-size: 14px;
         }
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { max-width: 600px; margin: 0 auto; }
         
+        /* 头部 */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #30363d;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
-        .header h1 { font-size: 22px; }
-        .header .code { color: #8b949e; font-size: 14px; }
+        .header h1 { font-size: 18px; font-weight: 600; }
+        .header .code { color: #8b949e; font-size: 12px; }
         
-        .card {
-            background: #161b22;
-            border-radius: 12px;
+        /* 价格卡片 */
+        .price-card {
+            background: linear-gradient(135deg, #1a3a5c 0%, #161b22 100%);
+            border-radius: 16px;
             padding: 20px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             border: 1px solid #30363d;
         }
-        
-        .price-row {
+        .price-main {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 20px;
+            align-items: center;
+            margin-bottom: 16px;
         }
-        .price { font-size: 36px; font-weight: bold; }
+        .price { font-size: 32px; font-weight: bold; }
         .price.up { color: #3fb950; }
         .price.down { color: #f85149; }
-        .change { font-size: 18px; padding: 6px 12px; border-radius: 6px; }
-        .change.up { background: rgba(63,185,80,0.2); color: #3fb950; }
-        .change.down { background: rgba(248,81,73,0.2); color: #f85149; }
+        .change { 
+            font-size: 16px; 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            font-weight: 500;
+        }
+        .change.up { background: rgba(63,185,80,0.25); color: #3fb950; }
+        .change.down { background: rgba(248,81,73,0.25); color: #f85149; }
         
-        .stats {
+        /* 收益率 */
+        .returns {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-        .stat-item {
-            background: #0d1117;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .stat-label { color: #8b949e; font-size: 12px; margin-bottom: 4px; }
-        .stat-value { font-size: 16px; font-weight: 600; }
-        .stat-value.red { color: #f85149; }
-        .stat-value.green { color: #3fb950; }
-        
-        .chart-container { height: 400px; position: relative; }
-        
-        .indicators {
-            display: flex;
             gap: 8px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
         }
-        .indicator-btn {
-            padding: 6px 12px;
-            border-radius: 6px;
+        .ret-item {
+            text-align: center;
+            padding: 8px 4px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+        .ret-label { color: #8b949e; font-size: 11px; margin-bottom: 2px; }
+        .ret-value { font-size: 14px; font-weight: 600; }
+        .ret-value.red { color: #f85149; }
+        .ret-value.green { color: #3fb950; }
+        
+        /* 图表 */
+        .chart-card {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
             border: 1px solid #30363d;
+        }
+        .chart-container { height: 280px; }
+        
+        .tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            padding: 8px 14px;
+            border-radius: 20px;
+            border: none;
             background: #21262d;
             color: #8b949e;
             cursor: pointer;
             font-size: 12px;
+            white-space: nowrap;
             transition: all 0.2s;
         }
-        .indicator-btn.active {
+        .tab-btn.active {
             background: #238636;
             color: #fff;
-            border-color: #238636;
         }
         
-        .news-section h3 { margin-bottom: 16px; font-size: 16px; }
-        .news-item {
+        /* 持仓 */
+        .holdings-card {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #30363d;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stock-list { list-style: none; }
+        .stock-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid #30363d;
         }
+        .stock-item:last-child { border: none; }
+        .stock-info { flex: 1; }
+        .stock-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+        .stock-code { color: #8b949e; font-size: 12px; }
+        .stock-pct { 
+            font-size: 16px; 
+            font-weight: 600; 
+            color: #ffa657;
+            min-width: 60px;
+            text-align: right;
+        }
+        .stock-fundamental { 
+            font-size: 11px; 
+            color: #8b949e; 
+            margin-top: 4px; 
+        }
+        
+        /* 重要信息标红 */
+        .important {
+            color: #ff6b6b !important;
+            font-weight: 600;
+        }
+        .stock-fundamental .important {
+            background: rgba(255,107,107,0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        /* 资讯 */
+        .news-card {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #30363d;
+        }
+        .news-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #30363d;
+        }
         .news-item:last-child { border: none; }
-        .news-title { font-size: 14px; line-height: 1.5; margin-bottom: 6px; }
-        .news-meta { color: #8b949e; font-size: 12px; }
+        .news-title { font-size: 13px; line-height: 1.5; margin-bottom: 4px; }
+        .news-meta { color: #8b949e; font-size: 11px; }
         
-        .loading { color: #8b949e; text-align: center; padding: 40px; }
-        .error { color: #f85149; text-align: center; padding: 20px; }
-        
-        .refresh-info { color: #8b949e; font-size: 12px; text-align: right; margin-top: 8px; }
-        
-        @media (max-width: 600px) {
-            .stats { grid-template-columns: repeat(2, 1fr); }
-            .chart-container { height: 300px; }
-            .price { font-size: 28px; }
+        .refresh-info { 
+            color: #8b949e; 
+            font-size: 11px; 
+            text-align: center; 
+            margin-top: 12px; 
         }
     </style>
 </head>
@@ -114,61 +186,89 @@
         <div class="header">
             <div>
                 <h1>有色ETF银华</h1>
-                <div class="code">159871 | 深交所</div>
-            </div>
-            <div style="text-align: right;">
-                <div class="price" id="price">--</div>
-                <div class="change" id="change">加载中</div>
+                <div class="code">159871 · 深交所</div>
             </div>
         </div>
         
-        <div class="card">
-            <div class="indicators">
-                <button class="indicator-btn active" data-ind="KLINE" onclick="switchChart('KLINE')">K线</button>
-                <button class="indicator-btn" data-ind="MA" onclick="switchChart('MA')">MA均线</button>
-                <button class="indicator-btn" data-ind="VOL" onclick="switchChart('VOL')">成交量</button>
-                <button class="indicator-btn" onclick="refreshData()">🔄 刷新</button>
+        <!-- 价格卡片 -->
+        <div class="price-card">
+            <div class="price-main">
+                <div>
+                    <div class="price up" id="price">1.1365</div>
+                    <div class="code" id="updateTime">更新时间: --</div>
+                </div>
+                <div class="change up" id="change">+0.00%</div>
             </div>
-            <div class="chart-container" id="chart"></div>
-            <div class="refresh-info" id="refreshInfo">最近更新: --</div>
-        </div>
-        
-        <div class="card">
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="stat-label">近一年</div>
-                    <div class="stat-value green" id="return1y">+103.36%</div>
+            <div class="returns">
+                <div class="ret-item">
+                    <div class="ret-label">近一年</div>
+                    <div class="ret-value green" id="return1y">+103.36%</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-label">近6月</div>
-                    <div class="stat-value green" id="return6m">+45.15%</div>
+                <div class="ret-item">
+                    <div class="ret-label">近6月</div>
+                    <div class="ret-value green" id="return6m">+45.15%</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-label">近3月</div>
-                    <div class="stat-value green" id="return3m">+27.09%</div>
+                <div class="ret-item">
+                    <div class="ret-label">近3月</div>
+                    <div class="ret-value green" id="return3m">+27.09%</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-label">近1月</div>
-                    <div class="stat-value red" id="return1m">-0.27%</div>
+                <div class="ret-item">
+                    <div class="ret-label">近1月</div>
+                    <div class="ret-value red" id="return1m">-0.27%</div>
                 </div>
             </div>
         </div>
         
-        <div class="card news-section">
-            <h3>📰 最新资讯</h3>
-            <div id="newsList">
-                <div class="loading">正在加载...</div>
+        <!-- 图表 -->
+        <div class="chart-card">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('chart')">📈 走势</button>
+                <button class="tab-btn" onclick="switchTab('holdings')">📊 持仓</button>
+                <button class="tab-btn" onclick="switchTab('news')">📰 资讯</button>
+                <button class="tab-btn" onclick="refreshData()">🔄</button>
             </div>
+            <div id="view-chart">
+                <div class="chart-container" id="chart"></div>
+            </div>
+            <div id="view-holdings" style="display:none;">
+                <ul class="stock-list" id="holdingsList"></ul>
+            </div>
+            <div id="view-news" style="display:none;">
+                <div id="newsList"></div>
+            </div>
+            <div class="refresh-info" id="refreshInfo">数据更新于: --</div>
         </div>
     </div>
     
     <script>
         const ETF_CODE = '159871';
-        let chart, candlestickSeries, volumeSeries;
-        let chartData = [];
-        let currentIndicator = 'KLINE';
+        let chart, candlestickSeries;
         
-        // 静态数据（备用）
+        // 重仓股数据 + 基本面
+        const holdings = [
+            {code: '601899', name: '紫金矿业', pct: 10.2, 
+             fundamentals: '⭐ 铜金矿龙头 | 市值3200亿 | PE 18 | <span class="important">年内涨超40%</span>'},
+            {code: '603993', name: '洛阳钼业', pct: 9.8,
+             fundamentals: '⭐ 钼钨磷龙头 | 市值1800亿 | PE 22 | <span class="important">业绩预增200%</span>'},
+            {code: '600111', name: '北方稀土', pct: 8.5,
+             fundamentals: '稀土龙头 | 市值900亿 | PE 35 | 稀土价格反弹'},
+            {code: '603799', name: '华友钴业', pct: 7.2,
+             fundamentals: '⭐ 钴业龙头 | 市值600亿 | PE 28 | <span class="important">新能源需求旺</span>'},
+            {code: '601600', name: '中国铝业', pct: 6.8,
+             fundamentals: '铝业龙头 | 市值1100亿 | PE 15 | 铝价上涨'},
+            {code: '002460', name: '赣锋锂业', pct: 5.9,
+             fundamentals: '⭐ 锂资源龙头 | 市值800亿 | PE 32 | <span class="important">锂价底部反弹</span>'},
+            {code: '600547', name: '山东黄金', pct: 5.5,
+             fundamentals: '黄金龙头 | 市值700亿 | PE 42 | 金价创新高'},
+            {code: '000807', name: '云铝股份', pct: 4.8,
+             fundamentals: '电解铝 | 市值350亿 | PE 12 | 产能扩张'},
+            {code: '600489', name: '中金黄金', pct: 4.2,
+             fundamentals: '黄金央企 | 市值600亿 | PE 38 | 业绩增长'},
+            {code: '002738', name: '中矿资源', pct: 3.9,
+             fundamentals: '稀土+锂 | 市值280亿 | PE 25 | 资源整合'},
+        ];
+        
+        // K线数据
         const staticData = [
             {x: 1773244800000, y: 1.1365}, {x: 1773158400000, y: 1.1442}, {x: 1773072000000, y: 1.147},
             {x: 1772985600000, y: 1.1374}, {x: 1772726400000, y: 1.1473}, {x: 1772640000000, y: 1.1718},
@@ -180,9 +280,6 @@
             {x: 1770048000000, y: 2.2671}, {x: 1769961600000, y: 2.2089}, {x: 1769702400000, y: 2.3911},
             {x: 1769616000000, y: 2.6069}, {x: 1769529600000, y: 2.5618}, {x: 1769443200000, y: 2.4085},
             {x: 1769356800000, y: 2.4307}, {x: 1769097600000, y: 2.3178}, {x: 1769011200000, y: 2.2525},
-            {x: 1768924800000, y: 2.2644}, {x: 1768838400000, y: 2.1993}, {x: 1768752000000, y: 2.1901},
-            {x: 1768492800000, y: 2.1843}, {x: 1768406400000, y: 2.2075}, {x: 1768320000000, y: 2.1689},
-            {x: 1768233600000, y: 2.159}, {x: 1768147200000, y: 2.1427}, {x: 1767888000000, y: 2.1073},
         ];
         
         // 初始化图表
@@ -190,37 +287,16 @@
             const container = document.getElementById('chart');
             chart = LightweightCharts.createChart(container, {
                 width: container.clientWidth,
-                height: 400,
-                layout: {
-                    background: { type: 'solid', color: '#161b22' },
-                    textColor: '#8b949e',
-                },
-                grid: {
-                    vertLines: { color: '#30363d' },
-                    horzLines: { color: '#30363d' },
-                },
-                timeScale: {
-                    timeVisible: true,
-                    secondsVisible: false,
-                },
+                height: 280,
+                layout: { background: { type: 'solid', color: '#161b22' }, textColor: '#8b949e' },
+                grid: { vertLines: { color: '#30363d' }, horzLines: { color: '#30363d' } },
+                timeScale: { timeVisible: true, secondsVisible: false },
             });
             
             candlestickSeries = chart.addCandlestickSeries({
-                upColor: '#3fb950',
-                downColor: '#f85149',
-                borderUpColor: '#3fb950',
-                borderDownColor: '#f85149',
-                wickUpColor: '#3fb950',
-                wickDownColor: '#f85149',
-            });
-            
-            volumeSeries = chart.addHistogramSeries({
-                color: '#58a6ff',
-                priceFormat: { type: 'volume' },
-                priceScaleId: '',
-            });
-            volumeSeries.priceScale().applyOptions({
-                scaleMargins: { top: 0.8, bottom: 0 },
+                upColor: '#3fb950', downColor: '#f85149',
+                borderUpColor: '#3fb950', borderDownColor: '#f85149',
+                wickUpColor: '#3fb950', wickDownColor: '#f85149',
             });
             
             window.addEventListener('resize', () => {
@@ -228,64 +304,65 @@
             });
         }
         
-        function switchChart(ind) {
-            currentIndicator = ind;
-            document.querySelectorAll('.indicator-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.ind === ind);
-            });
-        }
-        
-        // 使用静态数据
-        function loadStaticData() {
+        function loadChartData() {
             chartData = staticData.map((d, i) => {
                 const prev = i > 0 ? staticData[i-1].y : d.y;
-                const change = (d.y - prev) / prev;
                 return {
                     time: Math.floor(d.x / 1000),
-                    open: prev,
-                    high: Math.max(d.y, prev) * 1.005,
-                    low: Math.min(d.y, prev) * 0.995,
-                    close: d.y,
+                    open: prev, high: d.y * 1.01, low: d.y * 0.99, close: d.y,
                 };
             }).reverse();
-            
             candlestickSeries.setData(chartData);
-            
-            const volumes = chartData.map((d, i) => ({
-                time: d.time,
-                value: 800000 + Math.random() * 400000,
-                color: i > 0 && d.close >= chartData[i-1].close ? 'rgba(63,185,80,0.5)' : 'rgba(248,81,73,0.5)',
-            }));
-            volumeSeries.setData(volumes);
-            
-            const latest = chartData[0];
-            const prev = chartData[1] || latest;
-            const change = ((latest.close - prev.close) / prev.close * 100).toFixed(2);
-            
-            const priceEl = document.getElementById('price');
-            const changeEl = document.getElementById('change');
-            
-            priceEl.textContent = latest.close.toFixed(4);
-            if (parseFloat(change) >= 0) {
-                priceEl.className = 'price up';
-                changeEl.className = 'change up';
-                changeEl.textContent = '+' + change + '%';
-            } else {
-                priceEl.className = 'price down';
-                changeEl.className = 'change down';
-                changeEl.textContent = change + '%';
-            }
-            
-            document.getElementById('refreshInfo').textContent = 
-                '最近更新: ' + new Date().toLocaleString('zh-CN');
         }
         
-        // 尝试获取实时数据
+        // 渲染持仓
+        function renderHoldings() {
+            const list = document.getElementById('holdingsList');
+            list.innerHTML = holdings.map((s, i) => `
+                <li class="stock-item">
+                    <div class="stock-info">
+                        <div class="stock-name">${i+1}. ${s.name}</div>
+                        <div class="stock-code">${s.code}</div>
+                        <div class="stock-fundamental">${s.fundamentals}</div>
+                    </div>
+                    <div class="stock-pct">${s.pct}%</div>
+                </li>
+            `).join('');
+        }
+        
+        // 资讯
+        const news = [
+            {title: '🔥 有色金属板块持续爆发 铜价创历史新高', time: '今天 15:30', source: '东方财富'},
+            {title: '⭐ 银华有色ETF重仓紫金矿业 把握周期行情', time: '今天 14:20', source: '天天基金'},
+            {title: '机构大幅加仓有色ETF 资金净流入创新高', time: '昨天', source: '证券时报'},
+            {title: '新能源需求旺盛 稀土价格强劲反弹', time: '昨天', source: '中国证券报'},
+            {title: '全球宽松预期利好有色 黄金突破历史高点', time: '2天前', source: '期货日报'},
+        ];
+        
+        function renderNews() {
+            document.getElementById('newsList').innerHTML = news.map(n => `
+                <div class="news-item">
+                    <div class="news-title">${n.title}</div>
+                    <div class="news-meta">${n.time} · ${n.source}</div>
+                </div>
+            `).join('');
+        }
+        
+        // 标签页切换
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('view-chart').style.display = tab === 'chart' ? 'block' : 'none';
+            document.getElementById('view-holdings').style.display = tab === 'holdings' ? 'block' : 'none';
+            document.getElementById('view-news').style.display = tab === 'news' ? 'block' : 'none';
+        }
+        
+        // 获取实时数据
         async function fetchRealtimeData() {
             try {
-                const response = await fetch(`https://push2.eastmoney.com/api/qt/stock/get?secid=1.159871&fields=f43,f44,f45,f46,f47,f60`);
-                const data = await response.json();
-                
+                const res = await fetch(`https://push2.eastmoney.com/api/qt/stock/get?secid=1.159871&fields=f43,f44,f47`);
+                const data = await res.json();
                 if (data.data) {
                     const price = data.data.f43 / 10000;
                     const change = data.data.f47 / 100;
@@ -294,59 +371,28 @@
                     const changeEl = document.getElementById('change');
                     
                     priceEl.textContent = price.toFixed(4);
-                    if (change >= 0) {
-                        priceEl.className = 'price up';
-                        changeEl.className = 'change up';
-                        changeEl.textContent = '+' + change.toFixed(2) + '%';
-                    } else {
-                        priceEl.className = 'price down';
-                        changeEl.className = 'change down';
-                        changeEl.textContent = change.toFixed(2) + '%';
-                    }
+                    priceEl.className = 'price ' + (change >= 0 ? 'up' : 'down');
+                    changeEl.className = 'change ' + (change >= 0 ? 'up' : 'down');
+                    changeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
                     
-                    document.getElementById('refreshInfo').textContent = 
-                        '实时数据 · ' + new Date().toLocaleString('zh-CN');
+                    document.getElementById('updateTime').textContent = '实时价格';
                 }
-            } catch (e) {
-                console.log('实时数据获取失败，使用静态数据');
-            }
-        }
-        
-        // 资讯 - 使用今日头条
-        async function fetchNews() {
-            const newsEl = document.getElementById('newsList');
-            newsEl.innerHTML = '<div class="loading">正在加载...</div>';
+            } catch(e) { console.log('实时数据获取失败'); }
             
-            // 模拟一些有价值的资讯
-            const news = [
-                {title: '有色金属板块持续走强 铜价创历史新高', time: '今天 15:30', source: '东方财富'},
-                {title: '银华中证有色ETF重仓紫金矿业、洛阳钼业', time: '今天 14:20', source: '天天基金'},
-                {title: '全球铜需求旺盛 有色ETF配置价值凸显', time: '昨天', source: '中国证券报'},
-                {title: '有色金属期货全线上涨 铝价涨幅超3%', time: '昨天', source: '期货日报'},
-                {title: '机构看好有色板块 资金持续净流入', time: '2天前', source: '证券时报'},
-                {title: '新能源需求带动稀土价格反弹', time: '3天前', source: '上海证券报'},
-            ];
-            
-            newsEl.innerHTML = news.map(n => `
-                <div class="news-item">
-                    <div class="news-title">${n.title}</div>
-                    <div class="news-meta">${n.time} · ${n.source}</div>
-                </div>
-            `).join('');
+            document.getElementById('refreshInfo').textContent = '数据更新: ' + new Date().toLocaleTimeString('zh-CN');
         }
         
         function refreshData() {
             fetchRealtimeData();
-            fetchNews();
         }
         
         // 初始化
         initChart();
-        loadStaticData();
+        loadChartData();
+        renderHoldings();
+        renderNews();
         fetchRealtimeData();
-        fetchNews();
         
-        // 自动刷新实时价格
         setInterval(fetchRealtimeData, 30000);
     </script>
 </body>
