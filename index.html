@@ -18,7 +18,6 @@
         }
         .container { max-width: 600px; margin: 0 auto; }
         
-        /* 头部 */
         .header {
             display: flex;
             justify-content: space-between;
@@ -30,7 +29,6 @@
         .header h1 { font-size: 18px; font-weight: 600; }
         .header .code { color: #8b949e; font-size: 12px; }
         
-        /* 价格卡片 */
         .price-card {
             background: linear-gradient(135deg, #1a3a5c 0%, #161b22 100%);
             border-radius: 16px;
@@ -56,7 +54,6 @@
         .change.up { background: rgba(63,185,80,0.25); color: #3fb950; }
         .change.down { background: rgba(248,81,73,0.25); color: #f85149; }
         
-        /* 收益率 */
         .returns {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -73,112 +70,96 @@
         .ret-value.red { color: #f85149; }
         .ret-value.green { color: #3fb950; }
         
-        /* 图表 */
-        .chart-card {
-            background: #161b22;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 12px;
-            border: 1px solid #30363d;
-        }
-        .chart-container { height: 280px; }
-        
-        .tabs {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 10px;
-            overflow-x: auto;
-        }
-        .tab-btn {
-            padding: 8px 14px;
-            border-radius: 20px;
-            border: none;
-            background: #21262d;
-            color: #8b949e;
-            cursor: pointer;
-            font-size: 12px;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            background: #238636;
-            color: #fff;
-        }
-        
-        /* 持仓 */
-        .holdings-card {
+        .main-card {
             background: #161b22;
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 12px;
             border: 1px solid #30363d;
         }
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
+        
+        /* 导航切换 - 更明显 */
+        .nav-tabs {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            background: #21262d;
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 16px;
         }
+        .nav-tab {
+            flex: 1;
+            padding: 12px 0;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #8b949e;
+            transition: all 0.2s;
+        }
+        .nav-tab.active {
+            background: #238636;
+            color: #fff;
+        }
+        
+        .chart-container { height: 300px; }
         
         .stock-list { list-style: none; }
         .stock-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
+            padding: 14px 0;
             border-bottom: 1px solid #30363d;
         }
         .stock-item:last-child { border: none; }
         .stock-info { flex: 1; }
-        .stock-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+        .stock-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
         .stock-code { color: #8b949e; font-size: 12px; }
         .stock-pct { 
-            font-size: 16px; 
-            font-weight: 600; 
+            font-size: 18px; 
+            font-weight: bold; 
             color: #ffa657;
-            min-width: 60px;
+            min-width: 70px;
             text-align: right;
         }
         .stock-fundamental { 
-            font-size: 11px; 
+            font-size: 12px; 
             color: #8b949e; 
-            margin-top: 4px; 
+            margin-top: 6px; 
+            line-height: 1.4;
         }
         
-        /* 重要信息标红 */
         .important {
             color: #ff6b6b !important;
             font-weight: 600;
         }
         .stock-fundamental .important {
-            background: rgba(255,107,107,0.15);
+            background: rgba(255,107,107,0.2);
             padding: 2px 6px;
             border-radius: 4px;
+            margin: 0 2px;
         }
         
-        /* 资讯 */
-        .news-card {
-            background: #161b22;
-            border-radius: 12px;
-            padding: 16px;
-            border: 1px solid #30363d;
-        }
         .news-item {
-            padding: 10px 0;
+            padding: 14px 0;
             border-bottom: 1px solid #30363d;
         }
         .news-item:last-child { border: none; }
-        .news-title { font-size: 13px; line-height: 1.5; margin-bottom: 4px; }
-        .news-meta { color: #8b949e; font-size: 11px; }
+        .news-title { font-size: 14px; line-height: 1.5; margin-bottom: 6px; }
+        .news-meta { color: #8b949e; font-size: 12px; }
         
         .refresh-info { 
             color: #8b949e; 
-            font-size: 11px; 
+            font-size: 12px; 
             text-align: center; 
-            margin-top: 12px; 
+            margin-top: 16px; 
+            padding-top: 12px;
+            border-top: 1px solid #30363d;
         }
+        
+        .section { display: none; }
+        .section.active { display: block; }
     </style>
 </head>
 <body>
@@ -190,7 +171,6 @@
             </div>
         </div>
         
-        <!-- 价格卡片 -->
         <div class="price-card">
             <div class="price-main">
                 <div>
@@ -219,32 +199,36 @@
             </div>
         </div>
         
-        <!-- 图表 -->
-        <div class="chart-card">
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('chart')">📈 走势</button>
-                <button class="tab-btn" onclick="switchTab('holdings')">📊 持仓</button>
-                <button class="tab-btn" onclick="switchTab('news')">📰 资讯</button>
-                <button class="tab-btn" onclick="refreshData()">🔄</button>
+        <div class="main-card">
+            <!-- 导航 -->
+            <div class="nav-tabs">
+                <div class="nav-tab active" onclick="showTab('chart', this)">📈 走势</div>
+                <div class="nav-tab" onclick="showTab('holdings', this)">📊 持仓</div>
+                <div class="nav-tab" onclick="showTab('news', this)">📰 资讯</div>
             </div>
-            <div id="view-chart">
+            
+            <!-- K线图 -->
+            <div id="section-chart" class="section active">
                 <div class="chart-container" id="chart"></div>
             </div>
-            <div id="view-holdings" style="display:none;">
+            
+            <!-- 持仓 -->
+            <div id="section-holdings" class="section">
                 <ul class="stock-list" id="holdingsList"></ul>
             </div>
-            <div id="view-news" style="display:none;">
+            
+            <!-- 资讯 -->
+            <div id="section-news" class="section">
                 <div id="newsList"></div>
             </div>
-            <div class="refresh-info" id="refreshInfo">数据更新于: --</div>
+            
+            <div class="refresh-info" id="refreshInfo">👆 点击上方切换查看 · 数据更新: --</div>
         </div>
     </div>
     
     <script>
-        const ETF_CODE = '159871';
         let chart, candlestickSeries;
         
-        // 重仓股数据 + 基本面
         const holdings = [
             {code: '601899', name: '紫金矿业', pct: 10.2, 
              fundamentals: '⭐ 铜金矿龙头 | 市值3200亿 | PE 18 | <span class="important">年内涨超40%</span>'},
@@ -268,7 +252,6 @@
              fundamentals: '稀土+锂 | 市值280亿 | PE 25 | 资源整合'},
         ];
         
-        // K线数据
         const staticData = [
             {x: 1773244800000, y: 1.1365}, {x: 1773158400000, y: 1.1442}, {x: 1773072000000, y: 1.147},
             {x: 1772985600000, y: 1.1374}, {x: 1772726400000, y: 1.1473}, {x: 1772640000000, y: 1.1718},
@@ -282,15 +265,13 @@
             {x: 1769356800000, y: 2.4307}, {x: 1769097600000, y: 2.3178}, {x: 1769011200000, y: 2.2525},
         ];
         
-        // 初始化图表
         function initChart() {
             const container = document.getElementById('chart');
             chart = LightweightCharts.createChart(container, {
                 width: container.clientWidth,
-                height: 280,
+                height: 300,
                 layout: { background: { type: 'solid', color: '#161b22' }, textColor: '#8b949e' },
                 grid: { vertLines: { color: '#30363d' }, horzLines: { color: '#30363d' } },
-                timeScale: { timeVisible: true, secondsVisible: false },
             });
             
             candlestickSeries = chart.addCandlestickSeries({
@@ -305,7 +286,7 @@
         }
         
         function loadChartData() {
-            chartData = staticData.map((d, i) => {
+            const chartData = staticData.map((d, i) => {
                 const prev = i > 0 ? staticData[i-1].y : d.y;
                 return {
                     time: Math.floor(d.x / 1000),
@@ -315,10 +296,8 @@
             candlestickSeries.setData(chartData);
         }
         
-        // 渲染持仓
         function renderHoldings() {
-            const list = document.getElementById('holdingsList');
-            list.innerHTML = holdings.map((s, i) => `
+            document.getElementById('holdingsList').innerHTML = holdings.map((s, i) => `
                 <li class="stock-item">
                     <div class="stock-info">
                         <div class="stock-name">${i+1}. ${s.name}</div>
@@ -330,7 +309,6 @@
             `).join('');
         }
         
-        // 资讯
         const news = [
             {title: '🔥 有色金属板块持续爆发 铜价创历史新高', time: '今天 15:30', source: '东方财富'},
             {title: '⭐ 银华有色ETF重仓紫金矿业 把握周期行情', time: '今天 14:20', source: '天天基金'},
@@ -348,20 +326,26 @@
             `).join('');
         }
         
-        // 标签页切换
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+        function showTab(tabName, el) {
+            // 切换导航
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
             
-            document.getElementById('view-chart').style.display = tab === 'chart' ? 'block' : 'none';
-            document.getElementById('view-holdings').style.display = tab === 'holdings' ? 'block' : 'none';
-            document.getElementById('view-news').style.display = tab === 'news' ? 'block' : 'none';
+            // 切换内容
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('section-' + tabName).classList.add('active');
+            
+            // 如果切换到图表，重新调整大小
+            if (tabName === 'chart' && chart) {
+                setTimeout(() => {
+                    chart.applyOptions({ width: document.getElementById('chart').clientWidth });
+                }, 100);
+            }
         }
         
-        // 获取实时数据
         async function fetchRealtimeData() {
             try {
-                const res = await fetch(`https://push2.eastmoney.com/api/qt/stock/get?secid=1.159871&fields=f43,f44,f47`);
+                const res = await fetch('https://push2.eastmoney.com/api/qt/stock/get?secid=1.159871&fields=f43,f44,f47');
                 const data = await res.json();
                 if (data.data) {
                     const price = data.data.f43 / 10000;
@@ -379,11 +363,7 @@
                 }
             } catch(e) { console.log('实时数据获取失败'); }
             
-            document.getElementById('refreshInfo').textContent = '数据更新: ' + new Date().toLocaleTimeString('zh-CN');
-        }
-        
-        function refreshData() {
-            fetchRealtimeData();
+            document.getElementById('refreshInfo').textContent = '👆 点击上方切换查看 · 数据更新: ' + new Date().toLocaleTimeString('zh-CN');
         }
         
         // 初始化
