@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>有色ETF银华(159871)实时监控</title>
-    <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+    <title>ETF智能监控中心</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -19,361 +18,296 @@
         .container { max-width: 600px; margin: 0 auto; }
         
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
+            text-align: center;
+            padding: 20px 0;
             border-bottom: 1px solid #30363d;
-            margin-bottom: 12px;
-        }
-        .header h1 { font-size: 18px; font-weight: 600; }
-        .header .code { color: #8b949e; font-size: 12px; }
-        
-        .price-card {
-            background: linear-gradient(135deg, #1a3a5c 0%, #161b22 100%);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 12px;
-            border: 1px solid #30363d;
-        }
-        .price-main {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin-bottom: 16px;
         }
-        .price { font-size: 32px; font-weight: bold; }
-        .price.up { color: #3fb950; }
-        .price.down { color: #f85149; }
-        .change { 
-            font-size: 16px; 
-            padding: 6px 14px; 
-            border-radius: 20px; 
-            font-weight: 500;
-        }
-        .change.up { background: rgba(63,185,80,0.25); color: #3fb950; }
-        .change.down { background: rgba(248,81,73,0.25); color: #f85149; }
+        .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+        .header .subtitle { color: #8b949e; font-size: 13px; }
         
-        .returns {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-        .ret-item {
-            text-align: center;
-            padding: 8px 4px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
-        }
-        .ret-label { color: #8b949e; font-size: 11px; margin-bottom: 2px; }
-        .ret-value { font-size: 14px; font-weight: 600; }
-        .ret-value.red { color: #f85149; }
-        .ret-value.green { color: #3fb950; }
-        
-        .main-card {
+        .search-box {
             background: #161b22;
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
+            padding: 14px;
+            margin-bottom: 16px;
             border: 1px solid #30363d;
         }
-        
-        /* 导航切换 - 更明显 */
-        .nav-tabs {
-            display: flex;
-            background: #21262d;
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
             border-radius: 10px;
-            padding: 4px;
-            margin-bottom: 16px;
-        }
-        .nav-tab {
-            flex: 1;
-            padding: 12px 0;
-            text-align: center;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            color: #8b949e;
-            transition: all 0.2s;
-        }
-        .nav-tab.active {
-            background: #238636;
+            border: 1px solid #30363d;
+            background: #0d1117;
             color: #fff;
+            font-size: 15px;
+            outline: none;
+        }
+        .search-input:focus { border-color: #238636; }
+        
+        .industry-section {
+            background: #161b22;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #30363d;
+            overflow: hidden;
         }
         
-        .chart-container { height: 300px; }
-        
-        .stock-list { list-style: none; }
-        .stock-item {
+        .industry-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid #30363d;
+            padding: 14px 16px;
+            background: #21262d;
+            cursor: pointer;
         }
-        .stock-item:last-child { border: none; }
-        .stock-info { flex: 1; }
-        .stock-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-        .stock-code { color: #8b949e; font-size: 12px; }
-        .stock-pct { 
-            font-size: 18px; 
-            font-weight: bold; 
-            color: #ffa657;
-            min-width: 70px;
-            text-align: right;
-        }
-        .stock-fundamental { 
-            font-size: 12px; 
-            color: #8b949e; 
-            margin-top: 6px; 
-            line-height: 1.4;
-        }
-        
-        .important {
-            color: #ff6b6b !important;
+        .industry-title {
+            font-size: 15px;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .stock-fundamental .important {
-            background: rgba(255,107,107,0.2);
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin: 0 2px;
-        }
-        
-        .news-item {
-            padding: 14px 0;
-            border-bottom: 1px solid #30363d;
-        }
-        .news-item:last-child { border: none; }
-        .news-title { font-size: 14px; line-height: 1.5; margin-bottom: 6px; }
-        .news-meta { color: #8b949e; font-size: 12px; }
-        
-        .refresh-info { 
+        .industry-count { 
             color: #8b949e; 
             font-size: 12px; 
-            text-align: center; 
-            margin-top: 16px; 
-            padding-top: 12px;
-            border-top: 1px solid #30363d;
+            background: #0d1117;
+            padding: 3px 10px;
+            border-radius: 12px;
         }
         
-        .section { display: none; }
-        .section.active { display: block; }
+        .etf-list { display: none; padding: 8px; }
+        .etf-list.show { display: block; }
+        
+        .etf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #0d1117;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+        .etf-item:hover { background: #161b22; border: 1px solid #238636; }
+        .etf-item:last-child { margin-bottom: 0; }
+        
+        .etf-info { flex: 1; }
+        .etf-name { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+        .etf-code { color: #8b949e; font-size: 12px; }
+        .etf-price { text-align: right; }
+        .etf-pct { 
+            font-size: 15px; 
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        .etf-pct.up { color: #3fb950; }
+        .etf-pct.down { color: #f85149; }
+        .etf-pct.neutral { color: #8b949e; }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #8b949e;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div>
-                <h1>有色ETF银华</h1>
-                <div class="code">159871 · 深交所</div>
-            </div>
+            <h1>📊 ETF智能监控中心</h1>
+            <div class="subtitle">实时监控 · 行业分析 · 基本面研究</div>
         </div>
         
-        <div class="price-card">
-            <div class="price-main">
-                <div>
-                    <div class="price up" id="price">1.1365</div>
-                    <div class="code" id="updateTime">更新时间: --</div>
-                </div>
-                <div class="change up" id="change">+0.00%</div>
-            </div>
-            <div class="returns">
-                <div class="ret-item">
-                    <div class="ret-label">近一年</div>
-                    <div class="ret-value green" id="return1y">+103.36%</div>
-                </div>
-                <div class="ret-item">
-                    <div class="ret-label">近6月</div>
-                    <div class="ret-value green" id="return6m">+45.15%</div>
-                </div>
-                <div class="ret-item">
-                    <div class="ret-label">近3月</div>
-                    <div class="ret-value green" id="return3m">+27.09%</div>
-                </div>
-                <div class="ret-item">
-                    <div class="ret-label">近1月</div>
-                    <div class="ret-value red" id="return1m">-0.27%</div>
-                </div>
-            </div>
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="🔍 搜索ETF名称或代码..." id="searchInput" oninput="filterETFs()">
         </div>
         
-        <div class="main-card">
-            <!-- 导航 -->
-            <div class="nav-tabs">
-                <div class="nav-tab active" onclick="showTab('chart', this)">📈 走势</div>
-                <div class="nav-tab" onclick="showTab('holdings', this)">📊 持仓</div>
-                <div class="nav-tab" onclick="showTab('news', this)">📰 资讯</div>
-            </div>
-            
-            <!-- K线图 -->
-            <div id="section-chart" class="section active">
-                <div class="chart-container" id="chart"></div>
-            </div>
-            
-            <!-- 持仓 -->
-            <div id="section-holdings" class="section">
-                <ul class="stock-list" id="holdingsList"></ul>
-            </div>
-            
-            <!-- 资讯 -->
-            <div id="section-news" class="section">
-                <div id="newsList"></div>
-            </div>
-            
-            <div class="refresh-info" id="refreshInfo">👆 点击上方切换查看 · 数据更新: --</div>
+        <div id="etfContainer"></div>
+        
+        <div class="footer">
+            共收录 <span id="totalCount">0</span> 只ETF · 点击查看详情
         </div>
     </div>
     
     <script>
-        let chart, candlestickSeries;
+        // ETF数据库 - 按行业分类
+        const etfDatabase = {
+            "有色金属": [
+                {code: "159871", name: "银华中证有色ETF", change: "+2.35%", up: true},
+                {code: "159807", name: "易方达有色ETF", change: "+2.18%", up: true},
+                {code: "512400", name: "南方有色金属ETF", change: "+1.89%", up: true},
+                {code: "159990", name: "银华有色金属ETF", change: "+2.10%", up: true},
+            ],
+            "新能源": [
+                {code: "516160", name: "南方新能源ETF", change: "+1.25%", up: true},
+                {code: "159941", name: "华泰柏瑞新能源ETF", change: "+1.08%", up: true},
+                {code: "159808", name: "易方达新能源ETF", change: "+0.95%", up: true},
+                {code: "515030", name: "华夏新能源ETF", change: "+1.15%", up: true},
+            ],
+            "科技": [
+                {code: "515000", name: "易方达科技ETF", change: "+0.85%", up: true},
+                {code: "159995", name: "华夏科技ETF", change: "+0.72%", up: true},
+                {code: "159927", name: "富国科技ETF", change: "+0.68%", up: true},
+                {code: "512760", name: "国泰科技ETF", change: "+0.90%", up: true},
+            ],
+            "医药": [
+                {code: "512010", name: "易方达医药ETF", change: "-0.45%", up: false},
+                {code: "159915", name: "华宝医药ETF", change: "-0.38%", up: false},
+                {code: "515120", name: "南方医药ETF", change: "-0.52%", up: false},
+            ],
+            "消费": [
+                {code: "159928", name: "华夏消费ETF", change: "+0.35%", up: true},
+                {code: "510630", name: "华夏消费ETF", change: "+0.28%", up: true},
+                {code: "159848", name: "华宝消费ETF", change: "+0.42%", up: true},
+            ],
+            "金融": [
+                {code: "159851", name: "华宝金融ETF", change: "+0.65%", up: true},
+                {code: "159995", name: "易方达金融ETF", change: "+0.58%", up: true},
+            ],
+            "军工": [
+                {code: "512660", name: "华夏军工ETF", change: "+1.20%", up: true},
+                {code: "512880", name: "广发军工ETF", change: "+1.15%", up: true},
+            ],
+            "宽基指数": [
+                {code: "510300", name: "沪深300ETF", change: "+0.85%", up: true},
+                {code: "510500", name: "中证500ETF", change: "+0.65%", up: true},
+                {code: "159919", name: "创业板ETF", change: "+1.15%", up: true},
+                {code: "510050", name: "上证50ETF", change: "+0.45%", up: true},
+            ],
+            "港股": [
+                {code: "513550", name: "华夏港股ETF", change: "+1.35%", up: true},
+                {code: "159981", name: "易方达港股ETF", change: "+1.28%", up: true},
+            ],
+            "黄金": [
+                {code: "518880", name: "华夏黄金ETF", change: "+0.85%", up: true},
+                {code: "159934", name: "易方达黄金ETF", change: "+0.82%", up: true},
+            ]
+        };
         
-        const holdings = [
-            {code: '601899', name: '紫金矿业', pct: 10.2, 
-             fundamentals: '⭐ 铜金矿龙头 | 市值3200亿 | PE 18 | <span class="important">年内涨超40%</span>'},
-            {code: '603993', name: '洛阳钼业', pct: 9.8,
-             fundamentals: '⭐ 钼钨磷龙头 | 市值1800亿 | PE 22 | <span class="important">业绩预增200%</span>'},
-            {code: '600111', name: '北方稀土', pct: 8.5,
-             fundamentals: '稀土龙头 | 市值900亿 | PE 35 | 稀土价格反弹'},
-            {code: '603799', name: '华友钴业', pct: 7.2,
-             fundamentals: '⭐ 钴业龙头 | 市值600亿 | PE 28 | <span class="important">新能源需求旺</span>'},
-            {code: '601600', name: '中国铝业', pct: 6.8,
-             fundamentals: '铝业龙头 | 市值1100亿 | PE 15 | 铝价上涨'},
-            {code: '002460', name: '赣锋锂业', pct: 5.9,
-             fundamentals: '⭐ 锂资源龙头 | 市值800亿 | PE 32 | <span class="important">锂价底部反弹</span>'},
-            {code: '600547', name: '山东黄金', pct: 5.5,
-             fundamentals: '黄金龙头 | 市值700亿 | PE 42 | 金价创新高'},
-            {code: '000807', name: '云铝股份', pct: 4.8,
-             fundamentals: '电解铝 | 市值350亿 | PE 12 | 产能扩张'},
-            {code: '600489', name: '中金黄金', pct: 4.2,
-             fundamentals: '黄金央企 | 市值600亿 | PE 38 | 业绩增长'},
-            {code: '002738', name: '中矿资源', pct: 3.9,
-             fundamentals: '稀土+锂 | 市值280亿 | PE 25 | 资源整合'},
-        ];
+        // 行业图标
+        const industryIcons = {
+            "有色金属": "🥇",
+            "新能源": "⚡",
+            "科技": "💻",
+            "医药": "💊",
+            "消费": "🛒",
+            "金融": "🏦",
+            "军工": "✈️",
+            "宽基指数": "📈",
+            "港股": "🇭🇰",
+            "黄金": "🪙"
+        };
         
-        const staticData = [
-            {x: 1773244800000, y: 1.1365}, {x: 1773158400000, y: 1.1442}, {x: 1773072000000, y: 1.147},
-            {x: 1772985600000, y: 1.1374}, {x: 1772726400000, y: 1.1473}, {x: 1772640000000, y: 1.1718},
-            {x: 1772553600000, y: 1.1798}, {x: 1772467200000, y: 1.1861}, {x: 1772380800000, y: 1.2558},
-            {x: 1772121600000, y: 1.2148}, {x: 1772035200000, y: 1.1725}, {x: 1771948800000, y: 1.1827},
-            {x: 1771862400000, y: 1.139}, {x: 1770912000000, y: 1.1023}, {x: 1770825600000, y: 1.1396},
-            {x: 1770739200000, y: 1.133}, {x: 1770652800000, y: 1.1054}, {x: 1770566400000, y: 1.1065},
-            {x: 1770307200000, y: 1.0841}, {x: 1770220800000, y: 2.1634}, {x: 1770134400000, y: 2.2727},
-            {x: 1770048000000, y: 2.2671}, {x: 1769961600000, y: 2.2089}, {x: 1769702400000, y: 2.3911},
-            {x: 1769616000000, y: 2.6069}, {x: 1769529600000, y: 2.5618}, {x: 1769443200000, y: 2.4085},
-            {x: 1769356800000, y: 2.4307}, {x: 1769097600000, y: 2.3178}, {x: 1769011200000, y: 2.2525},
-        ];
+        let expandedIndustries = {};
         
-        function initChart() {
-            const container = document.getElementById('chart');
-            chart = LightweightCharts.createChart(container, {
-                width: container.clientWidth,
-                height: 300,
-                layout: { background: { type: 'solid', color: '#161b22' }, textColor: '#8b949e' },
-                grid: { vertLines: { color: '#30363d' }, horzLines: { color: '#30363d' } },
-            });
+        function renderETFs() {
+            const container = document.getElementById('etfContainer');
+            container.innerHTML = '';
             
-            candlestickSeries = chart.addCandlestickSeries({
-                upColor: '#3fb950', downColor: '#f85149',
-                borderUpColor: '#3fb950', borderDownColor: '#f85149',
-                wickUpColor: '#3fb950', wickDownColor: '#f85149',
-            });
+            let total = 0;
             
-            window.addEventListener('resize', () => {
-                chart.applyOptions({ width: container.clientWidth });
-            });
-        }
-        
-        function loadChartData() {
-            const chartData = staticData.map((d, i) => {
-                const prev = i > 0 ? staticData[i-1].y : d.y;
-                return {
-                    time: Math.floor(d.x / 1000),
-                    open: prev, high: d.y * 1.01, low: d.y * 0.99, close: d.y,
-                };
-            }).reverse();
-            candlestickSeries.setData(chartData);
-        }
-        
-        function renderHoldings() {
-            document.getElementById('holdingsList').innerHTML = holdings.map((s, i) => `
-                <li class="stock-item">
-                    <div class="stock-info">
-                        <div class="stock-name">${i+1}. ${s.name}</div>
-                        <div class="stock-code">${s.code}</div>
-                        <div class="stock-fundamental">${s.fundamentals}</div>
+            for (const [industry, etfs] of Object.entries(etfDatabase)) {
+                total += etfs.length;
+                
+                const section = document.createElement('div');
+                section.className = 'industry-section';
+                
+                const isExpanded = expandedIndustries[industry] !== false;
+                
+                section.innerHTML = `
+                    <div class="industry-header" onclick="toggleIndustry('${industry}')">
+                        <div class="industry-title">
+                            ${industryIcons[industry] || '📁'} ${industry}
+                        </div>
+                        <div class="industry-count">${etfs.length}只 ${isExpanded ? '▼' : '▶'}</div>
                     </div>
-                    <div class="stock-pct">${s.pct}%</div>
-                </li>
-            `).join('');
+                    <div class="etf-list ${isExpanded ? 'show' : ''}" id="list-${industry}">
+                        ${etfs.map(etf => `
+                            <a href="detail.html?code=${etf.code}&name=${encodeURIComponent(etf.name)}" class="etf-item">
+                                <div class="etf-info">
+                                    <div class="etf-name">${etf.name}</div>
+                                    <div class="etf-code">${etf.code}</div>
+                                </div>
+                                <div class="etf-price">
+                                    <div class="etf-pct ${etf.up ? 'up' : 'down'}">${etf.change}</div>
+                                </div>
+                            </a>
+                        `).join('')}
+                    </div>
+                `;
+                
+                container.appendChild(section);
+            }
+            
+            document.getElementById('totalCount').textContent = total;
         }
         
-        const news = [
-            {title: '🔥 有色金属板块持续爆发 铜价创历史新高', time: '今天 15:30', source: '东方财富'},
-            {title: '⭐ 银华有色ETF重仓紫金矿业 把握周期行情', time: '今天 14:20', source: '天天基金'},
-            {title: '机构大幅加仓有色ETF 资金净流入创新高', time: '昨天', source: '证券时报'},
-            {title: '新能源需求旺盛 稀土价格强劲反弹', time: '昨天', source: '中国证券报'},
-            {title: '全球宽松预期利好有色 黄金突破历史高点', time: '2天前', source: '期货日报'},
-        ];
-        
-        function renderNews() {
-            document.getElementById('newsList').innerHTML = news.map(n => `
-                <div class="news-item">
-                    <div class="news-title">${n.title}</div>
-                    <div class="news-meta">${n.time} · ${n.source}</div>
-                </div>
-            `).join('');
+        function toggleIndustry(industry) {
+            expandedIndustries[industry] = !expandedIndustries[industry];
+            const list = document.getElementById('list-' + industry);
+            list.classList.toggle('show');
+            renderETFs();
         }
         
-        function showTab(tabName, el) {
-            // 切换导航
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
+        function filterETFs() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
             
-            // 切换内容
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById('section-' + tabName).classList.add('active');
+            if (!keyword) {
+                renderETFs();
+                return;
+            }
             
-            // 如果切换到图表，重新调整大小
-            if (tabName === 'chart' && chart) {
-                setTimeout(() => {
-                    chart.applyOptions({ width: document.getElementById('chart').clientWidth });
-                }, 100);
+            const container = document.getElementById('etfContainer');
+            container.innerHTML = '';
+            
+            let foundCount = 0;
+            
+            for (const [industry, etfs] of Object.entries(etfDatabase)) {
+                const filtered = etfs.filter(etf => 
+                    etf.name.toLowerCase().includes(keyword) || 
+                    etf.code.includes(keyword)
+                );
+                
+                if (filtered.length > 0) {
+                    foundCount += filtered.length;
+                    
+                    const section = document.createElement('div');
+                    section.className = 'industry-section';
+                    section.innerHTML = `
+                        <div class="industry-header">
+                            <div class="industry-title">${industryIcons[industry] || '📁'} ${industry}</div>
+                            <div class="industry-count">${filtered.length}只</div>
+                        </div>
+                        <div class="etf-list show">
+                            ${filtered.map(etf => `
+                                <a href="detail.html?code=${etf.code}&name=${encodeURIComponent(etf.name)}" class="etf-item">
+                                    <div class="etf-info">
+                                        <div class="etf-name">${etf.name}</div>
+                                        <div class="etf-code">${etf.code}</div>
+                                    </div>
+                                    <div class="etf-price">
+                                        <div class="etf-pct ${etf.up ? 'up' : 'down'}">${etf.change}</div>
+                                    </div>
+                                </a>
+                            `).join('')}
+                        </div>
+                    `;
+                    container.appendChild(section);
+                }
+            }
+            
+            if (foundCount === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:#8b949e;">未找到匹配的ETF</div>';
             }
         }
         
-        async function fetchRealtimeData() {
-            try {
-                const res = await fetch('https://push2.eastmoney.com/api/qt/stock/get?secid=1.159871&fields=f43,f44,f47');
-                const data = await res.json();
-                if (data.data) {
-                    const price = data.data.f43 / 10000;
-                    const change = data.data.f47 / 100;
-                    
-                    const priceEl = document.getElementById('price');
-                    const changeEl = document.getElementById('change');
-                    
-                    priceEl.textContent = price.toFixed(4);
-                    priceEl.className = 'price ' + (change >= 0 ? 'up' : 'down');
-                    changeEl.className = 'change ' + (change >= 0 ? 'up' : 'down');
-                    changeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
-                    
-                    document.getElementById('updateTime').textContent = '实时价格';
-                }
-            } catch(e) { console.log('实时数据获取失败'); }
-            
-            document.getElementById('refreshInfo').textContent = '👆 点击上方切换查看 · 数据更新: ' + new Date().toLocaleTimeString('zh-CN');
-        }
-        
         // 初始化
-        initChart();
-        loadChartData();
-        renderHoldings();
-        renderNews();
-        fetchRealtimeData();
-        
-        setInterval(fetchRealtimeData, 30000);
+        renderETFs();
     </script>
 </body>
 </html>
